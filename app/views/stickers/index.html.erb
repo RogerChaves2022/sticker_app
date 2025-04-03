@@ -1,0 +1,56 @@
+<div class="container">
+  <h2 class="text-center mb-4">Minhas Figurinhas</h2>
+
+  <div class="text-center mb-3">
+    <%= link_to "Adicionar Figurinha", new_sticker_path, class: "btn btn-success" %>
+  </div>
+
+  <div class="row">
+    <% @stickers.each do |sticker| %>
+      <div class="col-md-3">
+        <div class="card mb-3">
+          <div class="card-body text-center">
+            <%= image_tag sticker.image, class: "img-fluid rounded", style: "max-height: 150px;" %>
+
+            <!-- Campo para digitar o número -->
+            <input type="text" id="phone_number_<%= sticker.id %>" placeholder="Digite o número" class="form-control mt-2">
+
+            <div class="mt-2">
+              <!-- Botão para enviar a figurinha -->
+              <button class="btn btn-success btn-sm send-whatsapp" data-sticker-id="<%= sticker.id %>">Enviar para WhatsApp</button>
+
+              <!-- Botão para remover a figurinha -->
+              <%= button_to "Remover", sticker_path(sticker), method: :delete, data: { confirm: "Tem certeza?" }, class: "btn btn-warning btn-sm" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".send-whatsapp").forEach(button => {
+      button.addEventListener("click", function () {
+        let stickerId = this.getAttribute("data-sticker-id");
+        let phoneNumber = document.getElementById(`phone_number_${stickerId}`).value.trim();
+        
+        if (!phoneNumber) {
+          alert("Por favor, digite um número de telefone.");
+          return;
+        }
+
+        // Redireciona para a rota de envio de figurinha com o número correto
+        let url = `<%= send_whatsapp_sticker_path(":id") %>`.replace(":id", stickerId);
+        fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-CSRF-Token": "<%= form_authenticity_token %>" },
+          body: JSON.stringify({ phone_number: phoneNumber })
+        }).then(response => response.json())
+          .then(data => alert(data.message))
+          .catch(error => console.error("Erro ao enviar:", error));
+      });
+    });
+  });
+</script>

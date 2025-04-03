@@ -1,0 +1,10 @@
+<h2>Adicionar Figurinha</h2>
+
+<%= form_with model: @sticker, local: true do |f| %>
+  <div>
+    <%= f.label :image, "Escolha uma imagem" %>
+    <%= f.file_field :image %>
+  </div>
+
+  <%= f.submit "Salvar" %>
+<% end %>
